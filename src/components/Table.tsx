@@ -3,14 +3,14 @@ import { useEffect, useState } from "react"
 
 const TableUI = () => {
     const [tramData, setTramData] = useState<TransportData[]>()
-    const [timeRemaining, setTimeRemaining] = useState<number>(5) // Inizializza a 5 secondi
+    const [timeRemaining, setTimeRemaining] = useState<number>(5) 
 
     const fetchTramData = async () => {
         try {
             const response = await fetch('https://api.rla2.cityway.fr/media/api/v1/fr/Schedules/LogicalStop/3522/NextDeparture?lineId=&direction=')
             const data = await response.json()
             setTramData(data)
-            setTimeRemaining(5) // Reset del timer a 5 secondi dopo ogni aggiornamento
+            setTimeRemaining(5) 
         } catch (error) {
             console.error("Error fetching tram data:", error)
         }
@@ -20,7 +20,7 @@ const TableUI = () => {
         fetchTramData()
         const interval = setInterval(async () => {
             await fetchTramData()
-        }, 5000) // Intervallo di 5 secondi per il primo aggiornamento
+        }, 5000) 
         return () => clearInterval(interval)
     }, [])
 
@@ -28,9 +28,9 @@ const TableUI = () => {
         if (timeRemaining > 0) {
             const countdownInterval = setInterval(() => {
                 setTimeRemaining(prevTime => prevTime - 1)
-            }, 1000) // Decremento ogni secondo
+            }, 1000) 
 
-            return () => clearInterval(countdownInterval) // Pulisce l'intervallo quando il componente è smontato
+            return () => clearInterval(countdownInterval)
         }
     }, [timeRemaining])
 
@@ -135,7 +135,6 @@ const styles = {
     badge: {
         display: "inline-block",
         padding: "5px 10px",
-        // backgroundColor: "red",
         color: "black",
         borderRadius: "4px",
         fontWeight: "bold",
