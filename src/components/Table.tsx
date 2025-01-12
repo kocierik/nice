@@ -76,31 +76,23 @@ const TableData = ({ tramData }: { tramData: TransportData[] }) => {
             <thead>
                 <tr style={styles.headerRow}>
                     <th style={styles.headerCell}>Linea</th>
-                    <th style={styles.headerCell}>Minuti Mancanti</th>
-                    <th style={styles.headerCell}>Orario Effettivo</th>
+                    <th style={styles.headerCell}>Direzione</th>
+                    <th style={styles.headerCell}>Minuti</th>
                 </tr>
             </thead>
             <tbody>
                 {tramData[0].lines.map((item: LineSchedule, i: number) => (
                     <tr key={i} style={styles.row}>
                         <td style={styles.cell}>
-                            <span style={styles.badge}>{item.line.number}</span> direzione{" "}
+                            <span style={styles.badge}>{item.line.number}</span>
+                        </td>
+                        <td style={styles.cell}>
                             <strong>{item.direction.name}</strong>
                         </td>
                         <td style={styles.cell}>
                             {item.times.map((tram: TransportTime, index) => (
                                 <span key={index} style={styles.highlight}>
                                     +{tram.timeDifference}{" "}
-                                </span>
-                            ))}
-                        </td>
-                        <td style={styles.cell}>
-                            {item.times.map((tram: TransportTime, index) => (
-                                <span
-                                    key={index}
-                                    style={{ ...styles.time, ...styles.time3D }}
-                                >
-                                    {tram.realDateTime?.slice(11, 16)}
                                 </span>
                             ))}
                         </td>
@@ -164,7 +156,7 @@ const styles = {
     badge: {
         display: "inline-block",
         padding: "5px 10px",
-        color: "black",
+        color: "white",
         borderRadius: "4px",
         fontWeight: "bold",
         marginRight: "5px",
