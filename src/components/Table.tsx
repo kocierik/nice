@@ -2,25 +2,35 @@ import { LineSchedule, TransportData, TransportTime } from "@/interface"
 import { useEffect, useState } from "react"
 
 const TableUI = () => {
-    const [tramData, setTramData] = useState<TransportData[]>()
-    const [timeRemaining, setTimeRemaining] = useState<number>(5) 
+    const [stationData, setStationData] = useState<{ [key: string]: TransportData[] }>({})
+    const [timeRemaining, setTimeRemaining] = useState<number>(5)
 
-    const fetchTramData = async () => {
+    const fetchTramData = async (stationId: string, url: string) => {
         try {
-            const response = await fetch('https://api.rla2.cityway.fr/media/api/v1/fr/Schedules/LogicalStop/3522/NextDeparture?lineId=&direction=')
+            const response = await fetch(url)
             const data = await response.json()
-            setTramData(data)
-            setTimeRemaining(5) 
+            setStationData(prevState => ({
+                ...prevState,
+                [stationId]: data,
+            }))
+            setTimeRemaining(5)
         } catch (error) {
             console.error("Error fetching tram data:", error)
         }
     }
 
     useEffect(() => {
-        fetchTramData()
-        const interval = setInterval(async () => {
-            await fetchTramData()
-        }, 5000) 
+        const magnanUrl = 'https://api.rla2.cityway.fr/media/api/v1/fr/Schedules/LogicalStop/1075/NextDeparture?lineId=&direction='
+        const carrasUrl = 'https://api.rla2.cityway.fr/media/api/v1/fr/Schedules/LogicalStop/3522/NextDeparture?lineId=&direction='
+
+        fetchTramData('magnan', magnanUrl)
+        fetchTramData('carras', carrasUrl)
+
+        const interval = setInterval(() => {
+            fetchTramData('magnan', magnanUrl)
+            fetchTramData('carras', carrasUrl)
+        }, 5000)
+
         return () => clearInterval(interval)
     }, [])
 
@@ -28,7 +38,7 @@ const TableUI = () => {
         if (timeRemaining > 0) {
             const countdownInterval = setInterval(() => {
                 setTimeRemaining(prevTime => prevTime - 1)
-            }, 1000) 
+            }, 1000)
 
             return () => clearInterval(countdownInterval)
         }
@@ -40,51 +50,64 @@ const TableUI = () => {
             <p style={styles.caption}>
                 Aggiornato tra {timeRemaining} secondi
             </p>
-            <table style={styles.table}>
-                <thead>
-                    <tr style={styles.headerRow}>
-                        <th style={styles.headerCell}>Linea</th>
-                        <th style={styles.headerCell}>Minuti Mancanti</th>
-                        <th style={styles.headerCell}>Orario Effettivo</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {tramData ? (
-                        tramData[0].lines.map((item: LineSchedule, i: number) => (
-                            <tr key={i} style={styles.row}>
-                                <td style={styles.cell}>
-                                    <span style={styles.badge}>{item.line.number}</span> direzione{" "}
-                                    <strong>{item.direction.name}</strong>
-                                </td>
-                                <td style={styles.cell}>
-                                    {item.times.map((tram: TransportTime, index) => (
-                                        <span key={index} style={styles.highlight}>
-                                            +{tram.timeDifference}{" "}
-                                        </span>
-                                    ))}
-                                </td>
-                                <td style={styles.cell}>
-                                    {item.times.map((tram: TransportTime, index) => (
-                                        <span
-                                            key={index}
-                                            style={{ ...styles.time, ...styles.time3D }}
-                                        >
-                                            {tram.realDateTime?.slice(11, 16)}
-                                        </span>
-                                    ))}
-                                </td>
-                            </tr>
-                        ))
-                    ) : (
-                        <tr>
-                            <td colSpan={3}>
-                                Nessun dato disponibile
-                            </td>
-                        </tr>
-                    )}
-                </tbody>
-            </table>
+
+            {/* Magnan Station Table */}
+            <h2 style={styles.stationTitle}>Stazione Magnan</h2>
+            {stationData.magnan ? (
+                <TableData tramData={stationData.magnan} />
+            ) : (
+                <p>Nessun dato disponibile per Magnan</p>
+            )}
+
+            {/* Carras Station Table */}
+            <h2 style={styles.stationTitle}>Stazione Carras</h2>
+            {stationData.carras ? (
+                <TableData tramData={stationData.carras} />
+            ) : (
+                <p>Nessun dato disponibile per Carras</p>
+            )}
         </div>
+    )
+}
+
+const TableData = ({ tramData }: { tramData: TransportData[] }) => {
+    return (
+        <table style={styles.table}>
+            <thead>
+                <tr style={styles.headerRow}>
+                    <th style={styles.headerCell}>Linea</th>
+                    <th style={styles.headerCell}>Minuti Mancanti</th>
+                    <th style={styles.headerCell}>Orario Effettivo</th>
+                </tr>
+            </thead>
+            <tbody>
+                {tramData[0].lines.map((item: LineSchedule, i: number) => (
+                    <tr key={i} style={styles.row}>
+                        <td style={styles.cell}>
+                            <span style={styles.badge}>{item.line.number}</span> direzione{" "}
+                            <strong>{item.direction.name}</strong>
+                        </td>
+                        <td style={styles.cell}>
+                            {item.times.map((tram: TransportTime, index) => (
+                                <span key={index} style={styles.highlight}>
+                                    +{tram.timeDifference}{" "}
+                                </span>
+                            ))}
+                        </td>
+                        <td style={styles.cell}>
+                            {item.times.map((tram: TransportTime, index) => (
+                                <span
+                                    key={index}
+                                    style={{ ...styles.time, ...styles.time3D }}
+                                >
+                                    {tram.realDateTime?.slice(11, 16)}
+                                </span>
+                            ))}
+                        </td>
+                    </tr>
+                ))}
+            </tbody>
+        </table>
     )
 }
 
@@ -109,6 +132,12 @@ const styles = {
         fontSize: "14px",
         color: "#7f8c8d",
         marginBottom: "20px",
+    },
+    stationTitle: {
+        fontSize: "20px",
+        fontWeight: "bold",
+        color: "white",
+        marginTop: "30px",
     },
     table: {
         width: "100%",
