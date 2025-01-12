@@ -12,9 +12,9 @@ export default defineConfig({
       registerType: 'autoUpdate',
       includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'mask-icon.svg'],
       manifest: {
-        name: 'Tram schedule', // <--- 👀
-        short_name: 'Tram schedule', // <--- 👀
-        description: 'simple tram schedule of Nice', // <--- 👀
+        name: 'Tram schedule', 
+        short_name: 'Tram schedule',
+        description: 'simple tram schedule of Nice',
         theme_color: '#ffffff',
         icons: [
           {

@@ -51,26 +51,36 @@ const TableUI = () => {
                 Aggiornato tra {timeRemaining} secondi
             </p>
 
-            {/* Magnan Station Table */}
-            <h2 style={styles.stationTitle}>Stazione Magnan</h2>
-            {stationData.magnan ? (
-                <TableData tramData={stationData.magnan} />
-            ) : (
-                <p>Nessun dato disponibile per Magnan</p>
-            )}
 
             {/* Carras Station Table */}
             <h2 style={styles.stationTitle}>Stazione Carras</h2>
             {stationData.carras ? (
-                <TableData tramData={stationData.carras} />
+                <TableData tramData={stationData.carras} index={0} />
             ) : (
                 <p>Nessun dato disponibile per Carras</p>
             )}
+
+            {/* Magnan Station Table */}
+            <h2 style={styles.stationTitle}>Stazione Magnan</h2>
+            {stationData.magnan ? (
+                <TableData tramData={stationData.magnan} index={0} />
+            ) : (
+                <p>Nessun dato disponibile per Magnan</p>
+            )}
+
+            {/* Magnan Bus Table */}
+            <h2 style={styles.stationTitle}>Stazione Bus Magnan</h2>
+            {stationData.magnan ? (
+                <TableData tramData={stationData.magnan} index={1} />
+            ) : (
+                <p>Nessun dato disponibile per Magnan</p>
+            )}
+
         </div>
     )
 }
 
-const TableData = ({ tramData }: { tramData: TransportData[] }) => {
+const TableData = ({ tramData, index }: { tramData: TransportData[], index: number }) => {
     return (
         <table style={styles.table}>
             <thead>
@@ -81,7 +91,7 @@ const TableData = ({ tramData }: { tramData: TransportData[] }) => {
                 </tr>
             </thead>
             <tbody>
-                {tramData[0].lines.map((item: LineSchedule, i: number) => (
+                {tramData[index].lines.map((item: LineSchedule, i: number) => (
                     <tr key={i} style={styles.row}>
                         <td style={styles.cell}>
                             <span style={styles.badge}>{item.line.number}</span>
