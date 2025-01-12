@@ -7,7 +7,7 @@ import Tram from "./tabs/Tram"
 function App() {
   return (
     <>
-        <Tabs.Root key={"plain"}  defaultValue="members" variant={"outline"}>
+        <Tabs.Root key={"plain"}  defaultValue="tram" variant={"outline"}>
           <Tabs.List flex={1}>
             <Tabs.Trigger value="tram" flex={1} justifyContent={"center"}>
               <LuFolder />
