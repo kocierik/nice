@@ -63,7 +63,7 @@ const TableUI = () => {
                         ))
                     ) : (
                         <tr>
-                            <td colSpan={3} style={styles.noData}>
+                            <td colSpan={3}>
                                 Nessun dato disponibile
                             </td>
                         </tr>
