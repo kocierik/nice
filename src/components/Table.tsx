@@ -3,12 +3,14 @@ import { useEffect, useState } from "react"
 
 const TableUI = () => {
     const [tramData, setTramData] = useState<TransportData[]>()
+    const [timeRemaining, setTimeRemaining] = useState<number>(5) // Inizializza a 5 secondi
 
     const fetchTramData = async () => {
         try {
             const response = await fetch('https://api.rla2.cityway.fr/media/api/v1/fr/Schedules/LogicalStop/3522/NextDeparture?lineId=&direction=')
             const data = await response.json()
             setTramData(data)
+            setTimeRemaining(5) // Reset del timer a 5 secondi dopo ogni aggiornamento
         } catch (error) {
             console.error("Error fetching tram data:", error)
         }
@@ -18,14 +20,26 @@ const TableUI = () => {
         fetchTramData()
         const interval = setInterval(async () => {
             await fetchTramData()
-        }, 10000)
+        }, 5000) // Intervallo di 5 secondi per il primo aggiornamento
         return () => clearInterval(interval)
     }, [])
+
+    useEffect(() => {
+        if (timeRemaining > 0) {
+            const countdownInterval = setInterval(() => {
+                setTimeRemaining(prevTime => prevTime - 1)
+            }, 1000) // Decremento ogni secondo
+
+            return () => clearInterval(countdownInterval) // Pulisce l'intervallo quando il componente è smontato
+        }
+    }, [timeRemaining])
 
     return (
         <div style={styles.container}>
             <h1 style={styles.title}>🚋 Orari Tram in Tempo Reale</h1>
-            <p style={styles.caption}>Aggiornato ogni 10 secondi</p>
+            <p style={styles.caption}>
+                Aggiornato tra {timeRemaining} secondi
+            </p>
             <table style={styles.table}>
                 <thead>
                     <tr style={styles.headerRow}>
@@ -88,7 +102,7 @@ const styles = {
     title: {
         fontSize: "24px",
         fontWeight: "bold",
-        color: "#2c3e50",
+        color: "white",
         marginBottom: "10px",
     },
     caption: {
